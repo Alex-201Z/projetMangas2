@@ -6,6 +6,9 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url('/assets/css/bootstrap.min.css') }}"/>
     <link rel="stylesheet" href="{{ url('/assets/icons/bootstrap-icons.css') }}"/>
+    <link rel="stylesheet" href="{{ url('/assets/css/mangas.css') }}"/>
+
+
 
 </head>
 

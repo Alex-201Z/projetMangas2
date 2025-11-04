@@ -1,4 +1,7 @@
 .bnv {
     text-align: center;
-    max-height: 120px;
+    max-height: 15px;
+}
+.img-thumbnail{
+    max-width: 120px;
 }

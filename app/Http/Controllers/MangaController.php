@@ -34,21 +34,22 @@ class MangaController extends Controller
     public function addManga()
     {
         try {
-            $serviceG = new GenreService();
-            $serviceS = new ScenaristeService();
-            $serviceD = new DessinateurService();
             $manga = new Manga();
-            $genres = $serviceG->getListGenres();
-            $scenaristes  = $serviceS->getListScenaristes();
-            $dessinateurs = $serviceD->getListDessinateurs();
-            return view('/formManga', compact('manga', 'genres', 'scenaristes', 'dessinateurs'));
+            return $this->showManga($manga);
         } catch (Exception $exception) {
-            return view("error", compact('exception'));
+            return view('error', compact('exception'));
         }
     }
     public function validManga(Request $request)
     {
         try {
+            $request->validate([
+                'titre' => 'required|max:250',
+                'genre' => 'required|exists:genre,id_genre',
+                'dess' => 'required|exists:dessinateur,id_dessinateur',
+                'scen' => 'required|exists:scenariste,id_scenariste',
+                'prix' => 'required|numeric|between:0,1000'
+            ]);
             $id = $request->get('id');
             $service = new MangaService();
             if ($id) {
@@ -77,21 +78,12 @@ class MangaController extends Controller
     public function editManga($id)
     {
         try {
-            $serviceG = new GenreService();
-            $serviceS = new ScenaristeService();
-            $serviceD = new DessinateurService();
             $service = new MangaService();
             $manga = $service->getManga($id);
-            $genres = $serviceG->getListGenres();
-            $scenaristes  = $serviceS->getListScenaristes();
-            $dessinateurs = $serviceD->getListDessinateurs();
-
-
-            return view('formManga', compact('manga', 'genres', 'scenaristes', 'dessinateurs'));
+            return $this->showManga($manga);
         } catch (Exception $exception) {
-            return view("error", compact('exception'));
+            return view('error', compact('exception'));
         }
-
     }
     public function removeManga($id)
     {
@@ -99,7 +91,7 @@ class MangaController extends Controller
             $service = new mangaService();
             $service->deleteManga($id);
 
-            return redirect(url ('listerManga'));
+            return redirect( route ('listMangas'));
 
         } catch (Exception $exception) {
             if ($exception->getCode() == 23000) {
@@ -109,6 +101,16 @@ class MangaController extends Controller
                 return view("error", compact('exception'));
             }
         }
+    }
+    private function showManga(Manga $manga)
+    {
+        $serviceG = new GenreService();
+        $genres = $serviceG->getListGenres();
+        $serviceD = new DessinateurService();
+        $dessinateurs = $serviceD->getListDessinateurs();
+        $serviceS = new ScenaristeService();
+        $scenaristes = $serviceS->getListScenaristes();
+        return view('formManga', compact('genres', 'dessinateurs', 'scenaristes', 'manga'));
     }
 
 }
