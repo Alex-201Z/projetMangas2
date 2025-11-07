@@ -22,7 +22,7 @@
             <div class="form-group">
                 <label class="col-md-3">Genre : </label>
                 <div class="col-md-6">
-                    <select class="form-select" name="Genre">
+                    <select class="form-select" @error('Genre') border-danger @enderror name="Genre">
                         <option value="" disabled>Sélectionner un genre</option>
                         @foreach($genres as $genre)
                             <option value="{{$genre->id_genre}}" @if ($manga->id_genre == $genre->id_genre) selected @endif>
@@ -35,7 +35,7 @@
             <div class="form-group">
                 <label class="col-md-3">Dessinateur : </label>
                 <div class="col-md-6">
-                    <select class="form-select" name="Dessinateur">
+                    <select class="form-select" @error('Dessinateur') border-danger @enderror name="Dessinateur">
                         <option value="" disabled selected>Sélectionner un Dessinateur</option>
                         @foreach($dessinateurs as $dessinateur)
                             <option value="{{$dessinateur->id_dessinateur}}" @if ($manga->id_dessinateur == $dessinateur->id_dessinateur) selected @endif>
@@ -48,7 +48,7 @@
             <div class="form-group">
                 <label class="col-md-3">Scenariste : </label>
                 <div class="col-md-6">
-                    <select class="form-select" name="Scenariste">
+                    <select class="form-select" @error('Scenariste') border-danger @enderror name="Scenariste">
                         <option value="" disabled selected>Sélectionner un Scenariste</option>
                         @foreach($scenaristes as $scenariste)
                             <option value="{{$scenariste->id_scenariste}}" @if ($manga->id_scenariste == $scenariste->id_scenariste) selected @endif>
@@ -87,4 +87,13 @@
             </div>
         </div>
     </form>
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 @endsection

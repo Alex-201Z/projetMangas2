@@ -12,7 +12,9 @@ use App\Services\DessinateurService;
 use App\Services\GenreService;
 use App\Services\ScenaristeService;
 use App\Models\Manga;
-use MongoDB\Driver\Session;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\ValidationException;
+
 
 class MangaController extends Controller
 {
@@ -31,6 +33,7 @@ class MangaController extends Controller
             return view("error", compact('exception'));
         }
     }
+
     public function addManga()
     {
         try {
@@ -40,16 +43,10 @@ class MangaController extends Controller
             return view('error', compact('exception'));
         }
     }
+
     public function validManga(Request $request)
     {
         try {
-            $request->validate([
-                'titre' => 'required|max:250',
-                'genre' => 'required|exists:genre,id_genre',
-                'dess' => 'required|exists:dessinateur,id_dessinateur',
-                'scen' => 'required|exists:scenariste,id_scenariste',
-                'prix' => 'required|numeric|between:0,1000'
-            ]);
             $id = $request->get('id');
             $service = new MangaService();
             if ($id) {
@@ -69,11 +66,26 @@ class MangaController extends Controller
                 $manga->couverture = $couv->getClientOriginalName();
                 $couv->move(public_path() . '\assets\images', $manga->couverture);
             }
+
+            try {
+                $request->validate([
+                    'titre' => 'required|max:250',
+                    'Genre' => 'required|exists:genre,id_genre',
+                    'Dessinateur' => 'required|exists:dessinateur,id_dessinateur',
+                    'Scenariste' => 'required|exists:scenariste,id_scenariste',
+                    'prix' => 'required|numeric|between:0,1000'
+                ]);
+                if (!$manga->couverture) {
+                    throw ValidationException::withMessages(['couv' => 'Vous devez fournir une image de couverture']);
+                }
+            } catch (ValidationException $exception) {
+
+                return $this->showManga($manga)->withErrors($exception->validator);
+            }
             $service->saveManga($manga);
             return redirect(route('listMangas'));
-        } catch (Exception $exception) {
-            return view('error', compact('exception'));
-        }
+        }  catch (Exception $exception) {
+        return view("error", compact('exception'));}
     }
     public function editManga($id)
     {
